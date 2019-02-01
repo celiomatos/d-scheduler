@@ -1,12 +1,12 @@
 --liquibase formatted sql
 
---changeset celio:19
+--changeset celio:92
 
 create schema if not exists quartz;
 
 --rollback drop schema scraper;
 
---changeset celio:20
+--changeset celio:93
 
 create table if not exists quartz.scheduler_job_info (
   job_id bigserial,
@@ -21,7 +21,7 @@ create table if not exists quartz.scheduler_job_info (
 
 --rollback drop table quartz.scheduler_job_info;
 
---changeset celio:21
+--changeset celio:94
 
 create table if not exists quartz.job_details (
     job_name character varying(128) NOT NULL,
@@ -39,7 +39,7 @@ create table if not exists quartz.job_details (
 
 --rollback drop table quartz.job_details;
 
---changeset celio:22
+--changeset celio:95
 
 create table if not exists quartz.triggers (
     trigger_name character varying(80) NOT NULL,
@@ -64,7 +64,7 @@ create table if not exists quartz.triggers (
 
 --rollback drop table quartz.triggers;
 
---changeset celio:23
+--changeset celio:96
 
 create table if not exists quartz.simple_triggers (
     trigger_name character varying(80) NOT NULL,
@@ -79,7 +79,7 @@ create table if not exists quartz.simple_triggers (
 
 --rollback drop table quartz.simple_triggers;
 
---changeset celio:24
+--changeset celio:97
 
 create table if not exists quartz.cron_triggers (
     trigger_name character varying(80) NOT NULL,
@@ -93,7 +93,7 @@ create table if not exists quartz.cron_triggers (
 
 --rollback drop table quartz.cron_triggers;
 
---changeset celio:25
+--changeset celio:98
 
 create table if not exists quartz.simprop_triggers (
     sched_name character varying(120) NOT NULL,
@@ -116,7 +116,7 @@ create table if not exists quartz.simprop_triggers (
 
 --rollback drop table quartz.simprop_triggers;
 
---changeset celio:26
+--changeset celio:99
 
 create table if not exists quartz.blob_triggers (
     trigger_name character varying(80) NOT NULL,
@@ -129,7 +129,7 @@ create table if not exists quartz.blob_triggers (
 
 --rollback drop table quartz.blob_triggers;
 
---changeset celio:27
+--changeset celio:100
 
 create table if not exists quartz.calendars (
     calendar_name character varying(80) NOT NULL,
@@ -140,7 +140,7 @@ create table if not exists quartz.calendars (
 
 --rollback drop table quartz.calendars;
 
---changeset celio:28
+--changeset celio:101
 
 create table if not exists quartz.paused_trigger_grps (
     trigger_group character varying(80) NOT NULL,
@@ -150,7 +150,7 @@ create table if not exists quartz.paused_trigger_grps (
 
 --rollback drop table quartz.paused_trigger_grps;
 
---changeset celio:29
+--changeset celio:102
 
 create table if not exists quartz.fired_triggers (
     entry_id character varying(95) NOT NULL,
@@ -172,7 +172,7 @@ create table if not exists quartz.fired_triggers (
 
 --rollback drop table quartz.fired_triggers;
 
---changeset celio:30
+--changeset celio:103
 
 create table if not exists quartz.scheduler_state (
     instance_name character varying(200) NOT NULL,
@@ -184,7 +184,7 @@ create table if not exists quartz.scheduler_state (
 
 --rollback drop table quartz.scheduler_state;
 
---changeset celio:31
+--changeset celio:104
 
 create table if not exists quartz.locks (
     lock_name character varying(40) NOT NULL,
@@ -194,98 +194,98 @@ create table if not exists quartz.locks (
 
 --rollback drop table quartz.locks;
 
---changeset celio:32
+--changeset celio:105
 
 create index if not exists job_details_sched_name_requests_recovery_idx on quartz.job_details(sched_name, requests_recovery);
 
---changeset celio:33
+--changeset celio:106
 
 create index if not exists job_details_sched_name_job_group_idx on quartz.job_details(sched_name,job_group);
 
---changeset celio:34
+--changeset celio:107
 
 create index if not exists blob_triggers_sched_name_trigger_name_trigger_group_idx on quartz.blob_triggers(sched_name, trigger_name, trigger_group);
 
---changeset celio:35
+--changeset celio:108
 
 create index if not exists triggers_sched_name_job_name_job_group_idx on quartz.triggers(sched_name, job_name, job_group);
 
---changeset celio:36
+--changeset celio:109
 
 create index if not exists triggers_sched_name_job_group_idx on quartz.triggers(sched_name, job_group);
 
---changeset celio:37
+--changeset celio:110
 
 create index if not exists triggers_sched_name_calendar_name_idx on quartz.triggers(sched_name, calendar_name);
 
---changeset celio:38
+--changeset celio:111
 
 create index if not exists triggers_sched_name_trigger_group_idx on quartz.triggers(sched_name, trigger_group);
 
---changeset celio:39
+--changeset celio:112
 
 create index if not exists triggers_sched_name_trigger_state_idx on quartz.triggers(sched_name, trigger_state);
 
---changeset celio:40
+--changeset celio:113
 
 create index if not exists triggers_sched_name_trigger_name_trigger_group_trigger_stat_idx on quartz.triggers(sched_name, trigger_name, trigger_group, trigger_state);
 
---changeset celio:41
+--changeset celio:114
 
 create index if not exists triggers_sched_name_trigger_group_trigger_state_idx on quartz.triggers(sched_name, trigger_group, trigger_state);
 
---changeset celio:42
+--changeset celio:115
 
 create index if not exists triggers_sched_name_next_fire_time_idx on quartz.triggers(sched_name, next_fire_time);
 
---changeset celio:43
+--changeset celio:116
 
 create index if not exists triggers_sched_name_trigger_state_next_fire_time_idx on quartz.triggers(sched_name, trigger_state, next_fire_time);
 
---changeset celio:44
+--changeset celio:117
 
 create index if not exists triggers_sched_name_misfire_instr_next_fire_time_idx on quartz.triggers(sched_name,misfire_instr,next_fire_time);
 
---changeset celio:45
+--changeset celio:118
 
 create index if not exists triggers_sched_name_misfire_instr_next_fire_time_trigger_st_idx on quartz.triggers(sched_name,misfire_instr,next_fire_time,trigger_state);
 
---changeset celio:46
+--changeset celio:119
 
 create index if not exists triggers_sched_name_misfire_instr_next_fire_time_trigger_gr_idx on quartz.triggers(sched_name, misfire_instr, next_fire_time, trigger_group, trigger_state);
 
---changeset celio:47
+--changeset celio:120
 
 create index if not exists fired_triggers_sched_name_instance_name_idx on quartz.fired_triggers(sched_name, instance_name);
 
---changeset celio:48
+--changeset celio:121
 
 create index if not exists fired_triggers_sched_name_instance_name_requests_recovery_idx on quartz.fired_triggers(sched_name, instance_name, requests_recovery);
 
---changeset celio:49
+--changeset celio:122
 
 create index if not exists fired_triggers_sched_name_job_name_job_group_idx on quartz.fired_triggers(sched_name, job_name, job_group);
 
---changeset celio:50
+--changeset celio:123
 
 create index if not exists fired_triggers_sched_name_job_group_idx on quartz.fired_triggers(sched_name, job_group);
 
---changeset celio:51
+--changeset celio:124
 
 create index if not exists fired_triggers_sched_name_trigger_name_trigger_group_idx on quartz.fired_triggers(sched_name, trigger_name, trigger_group);
 
---changeset celio:52
+--changeset celio:125
 
 create index if not exists fired_triggers_sched_name_trigger_group_idx on quartz.fired_triggers(sched_name, trigger_group);
 
---changeset celio:53
+--changeset celio:126
 
 INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time)
 	VALUES ('0 0/5 * ? * *', TRUE, 'default-group', 'job-a', TRUE, NULL);
 
 --rollback delete from quartz.scheduler_job_info where job_name = 'job-a';
 
---changeset celio:54
+--changeset celio:127
 
 INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time)
 	VALUES (NULL, TRUE, 'default-group', 'job-b', FALSE, '600000');
