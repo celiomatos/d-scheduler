@@ -1,20 +1,20 @@
 package br.com.dscheduler.job;
 
+import br.com.dscheduler.config.ClientHttp;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import java.util.Date;
-
 @Slf4j
 @DisallowConcurrentExecution
-public class SampleJobB extends QuartzJobBean {
-
+public class JobA extends QuartzJobBean {
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        log.info("Job B is running ::: " + new Date());
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+
+        new ClientHttp().get(context);
     }
+
 }

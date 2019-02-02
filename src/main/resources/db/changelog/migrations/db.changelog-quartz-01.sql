@@ -10,12 +10,13 @@ create schema if not exists quartz;
 
 create table if not exists quartz.scheduler_job_info (
   job_id bigserial,
-  job_cron_expression varchar(255),
+  job_cron_expression character varying(255),
   job_cron boolean NOT NULL,
   job_enable boolean NOT NULL,
-  job_group varchar(255) NOT NULL,
-  job_name varchar(255) NOT NULL UNIQUE,
+  job_group character varying(255) NOT NULL,
+  job_name character varying(255) NOT NULL UNIQUE,
   job_repeat_time bigint,
+  job_command character varying(256) NOT NULL,
   primary key (job_id)
 );
 
@@ -280,14 +281,14 @@ create index if not exists fired_triggers_sched_name_trigger_group_idx on quartz
 
 --changeset celio:126
 
-INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time)
-	VALUES ('0 0/5 * ? * *', TRUE, 'default-group', 'job-a', TRUE, NULL);
+INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time, job_command)
+	VALUES ('0 */3 * ? * *', TRUE, 'default-group', 'job-a', TRUE, NULL, 'http://localhost:10123/scraper');
 
 --rollback delete from quartz.scheduler_job_info where job_name = 'job-a';
 
 --changeset celio:127
 
-INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time)
-	VALUES (NULL, TRUE, 'default-group', 'job-b', FALSE, '600000');
+INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time, job_command)
+	VALUES ('0 */5 * ? * *', TRUE, 'default-group', 'job-b', TRUE, NULL, 'http://localhost:10123/scraper');
 
 --rollback delete from quartz.scheduler_job_info where job_name = 'job-b';

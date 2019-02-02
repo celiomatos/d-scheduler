@@ -27,11 +27,14 @@ public class SchedulerJobInfo implements Serializable {
     private boolean enable;
 
     @Column(name = "job_cron_expression")
-    private String cronExpression;
+    private String expression;
 
     @Column(name = "job_repeat_time")
     private Long repeatTime;
 
     @Column(name = "job_cron", nullable = false)
     private boolean cron;
+
+    @Column(name = "job_command", nullable = false)
+    private String command;
 }
