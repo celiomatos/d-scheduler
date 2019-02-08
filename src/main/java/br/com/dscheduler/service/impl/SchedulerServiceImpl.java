@@ -1,8 +1,7 @@
 package br.com.dscheduler.service.impl;
 
 import br.com.dscheduler.component.JobScheduleCreator;
-import br.com.dscheduler.job.JobA;
-import br.com.dscheduler.job.JobB;
+import br.com.dscheduler.job.JobRun;
 import br.com.dscheduler.model.SchedulerJobInfo;
 import br.com.dscheduler.repository.SchedulerRepository;
 import br.com.dscheduler.service.SchedulerService;
@@ -37,33 +36,11 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void startAllSchedulers() {
         List<SchedulerJobInfo> jobInfoList = schedulerRepository.findAll();
-        if (jobInfoList != null) {
-            Scheduler scheduler = schedulerFactoryBean.getScheduler();
+
+        if (!jobInfoList.isEmpty()) {
             jobInfoList.forEach(jobInfo -> {
-                try {
-                    if (jobInfo.isEnable()) {
-                        JobKey jobKey = new JobKey(jobInfo.getName(), jobInfo.getGroup());
-                        JobDetail jobDetail = newJobDetail(jobInfo);
-
-                        if (!scheduler.checkExists(jobDetail.getKey())) {
-                            createJobDetail(jobKey);
-
-                            Trigger trigger;
-
-                            if (jobInfo.isCron() && CronExpression.isValidExpression(jobInfo.getExpression())) {
-                                trigger = scheduleCreator.createCronTrigger(jobInfo.getName(), new Date(),
-                                        jobInfo.getExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
-                            } else {
-                                trigger = scheduleCreator.createSimpleTrigger(jobInfo.getName(), new Date(),
-                                        jobInfo.getRepeatTime(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
-                            }
-
-                            scheduler.scheduleJob(jobDetail, trigger);
-
-                        }
-                    }
-                } catch (SchedulerException e) {
-                    log.error(e.getMessage(), e);
+                if (jobInfo.isEnable()) {
+                    scheduleNewJob(jobInfo);
                 }
             });
         }
@@ -75,22 +52,26 @@ public class SchedulerServiceImpl implements SchedulerService {
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
             JobKey jobKey = new JobKey(jobInfo.getName(), jobInfo.getGroup());
-            JobDetail jobDetail = newJobDetail(jobInfo);
+            JobDetail jobDetail = JobBuilder.newJob(JobRun.class)
+                    .withIdentity(jobKey)
+                    .usingJobData("command", jobInfo.getCommand())
+                    .build();
 
             if (!scheduler.checkExists(jobDetail.getKey())) {
-
-                createJobDetail(jobKey);
+                scheduleCreator.createJob(JobRun.class, false, context, jobKey.getName(), jobKey.getGroup());
 
                 Trigger trigger;
-                if (jobInfo.isCron()) {
-                    trigger = scheduleCreator.createCronTrigger(jobInfo.getName(), new Date(), jobInfo.getExpression(),
-                            SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+
+                if (jobInfo.isCron() && CronExpression.isValidExpression(jobInfo.getExpression())) {
+                    trigger = scheduleCreator.createCronTrigger(jobInfo.getName(), new Date(),
+                            jobInfo.getExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
                 } else {
-                    trigger = scheduleCreator.createSimpleTrigger(jobInfo.getName(), new Date(), jobInfo.getRepeatTime(),
-                            SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+                    trigger = scheduleCreator.createSimpleTrigger(jobInfo.getName(), new Date(),
+                            jobInfo.getRepeatTime(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
                 }
 
                 scheduler.scheduleJob(jobDetail, trigger);
+
                 schedulerRepository.save(jobInfo);
             } else {
                 log.error("scheduleNewJobRequest.jobAlreadyExist");
@@ -169,41 +150,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         } catch (SchedulerException e) {
             log.error("Failed to start new job - {}", jobInfo.getName(), e);
             return false;
-        }
-    }
-
-    private JobDetail newJobDetail(SchedulerJobInfo jobInfo) {
-
-        JobKey jobKey = new JobKey(jobInfo.getName(), jobInfo.getGroup());
-
-        switch (jobKey.getName()) {
-            case "job-a": {
-                return JobBuilder.newJob(JobA.class)
-                        .withIdentity(jobKey)
-                        .usingJobData("command", jobInfo.getCommand())
-                        .build();
-            }
-            case "job-b": {
-                return JobBuilder.newJob(JobB.class)
-                        .withIdentity(jobKey)
-                        .usingJobData("command", jobInfo.getCommand())
-                        .build();
-            }
-            default:
-                return null;
-        }
-    }
-
-    private void createJobDetail(JobKey jobKey) {
-        switch (jobKey.getName()) {
-            case "job-a": {
-                scheduleCreator.createJob(JobA.class, false, context, jobKey.getName(), jobKey.getGroup());
-            }
-            case "job-b": {
-                scheduleCreator.createJob(JobB.class, false, context, jobKey.getName(), jobKey.getGroup());
-            }
-            default:
-                log.error("Job {} not found", jobKey.getName());
         }
     }
 }

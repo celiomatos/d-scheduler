@@ -9,7 +9,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 @Slf4j
 @DisallowConcurrentExecution
-public class JobA extends QuartzJobBean {
+public class JobRun extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
