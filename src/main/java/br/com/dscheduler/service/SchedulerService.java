@@ -6,9 +6,9 @@ public interface SchedulerService {
 
     void startAllSchedulers();
 
-    void scheduleNewJob(SchedulerJobInfo jobInfo);
+    boolean scheduleNewJob(SchedulerJobInfo jobInfo);
 
-    void updateScheduleJob(SchedulerJobInfo jobInfo);
+    boolean updateScheduleJob(SchedulerJobInfo jobInfo);
 
     boolean unScheduleJob(String jobName);
 
