@@ -154,7 +154,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("command", jobInfo.getCommand());
-        jobDataMap.put("token", "bearer 5ff72880-05d0-4b05-ae43-39f08ed61960");
+        jobDataMap.put("token", "bearer " + jobInfo.getToken());
 
         log.info("{} ::: " + jobInfo.getCommand(), jobInfo.isCron() ? jobInfo.getExpression() : jobInfo.getRepeatTime());
 
@@ -169,7 +169,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         Trigger trigger;
 
         if (jobInfo.isCron() && CronExpression.isValidExpression(jobInfo.getExpression())) {
-            trigger =  scheduleCreator.createCronTrigger(jobInfo.getName(), null,
+            trigger = scheduleCreator.createCronTrigger(jobInfo.getName(), null,
                     jobInfo.getExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
         } else {
             trigger = scheduleCreator.createSimpleTrigger(jobInfo.getName(), null,

@@ -17,6 +17,7 @@ create table if not exists quartz.scheduler_job_info (
   job_name character varying(255) NOT NULL UNIQUE,
   job_repeat_time bigint,
   job_command character varying(256) NOT NULL,
+  job_token character varying(40),
   primary key (job_id)
 );
 
@@ -282,13 +283,13 @@ create index if not exists fired_triggers_sched_name_trigger_group_idx on quartz
 --changeset celio:126
 
 INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time, job_command)
-	VALUES ('0 */3 * ? * *', TRUE, 'default-group', 'job-a', TRUE, NULL, 'http://localhost:10123/scraper');
+	VALUES ('0 20 14 ? * *', TRUE, 'default-group', 'job-a', TRUE, NULL, 'http://d-server-scraper:8083/scraper/pagamento-mes-atual');
 
 --rollback delete from quartz.scheduler_job_info where job_name = 'job-a';
 
 --changeset celio:127
 
 INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time, job_command)
-	VALUES ('0 */5 * ? * *', TRUE, 'default-group', 'job-b', TRUE, NULL, 'http://localhost:10123/scraper');
+	VALUES ('0 50 14 ? * *', TRUE, 'default-group', 'job-b', TRUE, NULL, 'http://d-server-scraper:8083/scraper/pagamento-mes-anterior');
 
 --rollback delete from quartz.scheduler_job_info where job_name = 'job-b';
