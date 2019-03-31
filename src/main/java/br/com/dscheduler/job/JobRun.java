@@ -19,14 +19,11 @@ public class JobRun extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
-        String token = context.getJobDetail().getJobDataMap().getString("token");
         String command = context.getJobDetail().getJobDataMap().getString("command");
 
         log.info("Job {} is running ::: " + new Date(), context.getJobDetail().getKey().getName());
-        log.info(token + " :::::: " + command);
 
         Request request = new Request.Builder()
-                .header("Authorization", token)
                 .url(command)
                 .build();
 

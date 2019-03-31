@@ -37,7 +37,4 @@ public class SchedulerJobInfo implements Serializable {
 
     @Column(name = "job_command", nullable = false)
     private String command;
-
-    @Column(name = "job_token", length = 40)
-    private String token;
 }

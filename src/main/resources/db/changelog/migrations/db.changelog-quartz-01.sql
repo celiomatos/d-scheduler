@@ -17,7 +17,6 @@ create table if not exists quartz.scheduler_job_info (
   job_name character varying(255) NOT NULL UNIQUE,
   job_repeat_time bigint,
   job_command character varying(256) NOT NULL,
-  job_token character varying(40),
   primary key (job_id)
 );
 
