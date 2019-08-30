@@ -1,7 +1,7 @@
 package br.com.dscheduler.service;
 
 import br.com.dscheduler.component.JobScheduleCreator;
-import br.com.dscheduler.job.JobRun;
+import br.com.dscheduler.job.*;
 import br.com.dscheduler.model.SchedulerJobInfo;
 import br.com.dscheduler.repository.SchedulerRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -56,23 +56,22 @@ public class SchedulerService {
         try {
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
-            JobDetail jobDetail = getJobDetail(jobInfo);
-
-            JobKey jobKey = jobDetail.getKey();
+            JobKey jobKey = new JobKey(jobInfo.getName(), jobInfo.getGroup());
 
             if (scheduler.checkExists(jobKey)) {
                 deleteJob(jobInfo);
             }
-            scheduleCreator.createJob(JobRun.class, false, context, jobKey.getName(), jobKey.getGroup());
 
-            Trigger trigger = getTrigger(jobInfo);
+            JobDetail jobDetail = getJobDetail(jobInfo);
+            if (jobDetail != null) {
+                Trigger trigger = getTrigger(jobInfo);
 
-            scheduler.scheduleJob(jobDetail, trigger);
+                scheduler.scheduleJob(jobDetail, trigger);
 
-            if (jobInfo.getId() == null) {
-                schedulerRepository.save(jobInfo);
+                if (jobInfo.getId() == null) {
+                    schedulerRepository.save(jobInfo);
+                }
             }
-
             return true;
         } catch (SchedulerException e) {
             log.error(e.getMessage(), e);
@@ -179,15 +178,29 @@ public class SchedulerService {
 
         JobKey jobKey = new JobKey(jobInfo.getName(), jobInfo.getGroup());
 
-        JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("command", jobInfo.getCommand());
+        log.info("{} ::: ", jobInfo.isCron() ? jobInfo.getExpression() : jobInfo.getRepeatTime());
+        JobDetail jobDetail = null;
 
-        log.info("{} ::: " + jobInfo.getCommand(), jobInfo.isCron() ? jobInfo.getExpression() : jobInfo.getRepeatTime());
-
-        return JobBuilder.newJob(JobRun.class)
-                .withIdentity(jobKey)
-                .usingJobData(jobDataMap)
-                .build();
+        if (jobKey.getName().equalsIgnoreCase("job-pagamento-mes-atual")) {
+            scheduleCreator.createJob(PagamentoMesAtualJob.class, false, context, jobKey.getName(), jobKey.getGroup());
+            jobDetail = JobBuilder.newJob(PagamentoMesAtualJob.class).withIdentity(jobKey).build();
+        } else if (jobKey.getName().equalsIgnoreCase("job-pagamento-mes-anterior")) {
+            scheduleCreator.createJob(PagamentoMesAnteriorJob.class, false, context, jobKey.getName(), jobKey.getGroup());
+            jobDetail = JobBuilder.newJob(PagamentoMesAnteriorJob.class).withIdentity(jobKey).build();
+        } else if (jobKey.getName().equalsIgnoreCase("job-empenho-ano-atual")) {
+            scheduleCreator.createJob(EmpenhoAnoAtualJob.class, false, context, jobKey.getName(), jobKey.getGroup());
+            jobDetail = JobBuilder.newJob(EmpenhoAnoAtualJob.class).withIdentity(jobKey).build();
+        } else if (jobKey.getName().equalsIgnoreCase("job-empenho-ano-anterior")) {
+            scheduleCreator.createJob(EmpenhoAnoAnteriorJob.class, false, context, jobKey.getName(), jobKey.getGroup());
+            jobDetail = JobBuilder.newJob(EmpenhoAnoAnteriorJob.class).withIdentity(jobKey).build();
+        } else if (jobKey.getName().equalsIgnoreCase("job-email-alert")) {
+            scheduleCreator.createJob(MailAlertJob.class, false, context, jobKey.getName(), jobKey.getGroup());
+            jobDetail = JobBuilder.newJob(MailAlertJob.class).withIdentity(jobKey).build();
+        } else if (jobKey.getName().equalsIgnoreCase("job-email-pagamento")) {
+            scheduleCreator.createJob(MailPaymentJob.class, false, context, jobKey.getName(), jobKey.getGroup());
+            jobDetail = JobBuilder.newJob(MailPaymentJob.class).withIdentity(jobKey).build();
+        }
+        return jobDetail;
     }
 
     /**

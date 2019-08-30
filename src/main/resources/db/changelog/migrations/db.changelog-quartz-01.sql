@@ -16,7 +16,6 @@ create table if not exists quartz.scheduler_job_info (
   job_group character varying(255) NOT NULL,
   job_name character varying(255) NOT NULL UNIQUE,
   job_repeat_time bigint,
-  job_command character varying(256) NOT NULL,
   primary key (job_id)
 );
 
@@ -278,31 +277,3 @@ create index if not exists fired_triggers_sched_name_trigger_name_trigger_group_
 --changeset celio:125
 
 create index if not exists fired_triggers_sched_name_trigger_group_idx on quartz.fired_triggers(sched_name, trigger_group);
-
---changeset celio:126
-
-INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time, job_command)
-	VALUES ('10 20 9,15,20 ? * *', TRUE, 'default-group', 'job-pagamento-mes-atual', TRUE, NULL, 'http://d-server-scraper:8083/scraper/pagamento-mes-atual');
-
---rollback delete from quartz.scheduler_job_info where job_name = 'job-a';
-
---changeset celio:127
-
-INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time, job_command)
-	VALUES ('20 50 */5 ? * *', TRUE, 'default-group', 'job-pagamento-mes-anterior', TRUE, NULL, 'http://d-server-scraper:8083/scraper/pagamento-mes-anterior');
-
---rollback delete from quartz.scheduler_job_info where job_name = 'job-b';
-
---changeset celio:206
-
-INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time, job_command)
-	VALUES ('30 10 */2 ? * *', TRUE, 'default-group', 'job-empenho-ano-atual', TRUE, NULL, 'http://d-server-scraper:8083/scraper/empenho-ano-atual');
-
---rollback delete from quartz.scheduler_job_info where job_name = 'job-b';
-
---changeset celio:207
-
-INSERT INTO quartz.scheduler_job_info (job_cron_expression, job_enable, job_group, job_name, job_cron, job_repeat_time, job_command)
-	VALUES ('40 40 * ? * *', TRUE, 'default-group', 'job-empenho-ano-anterior', TRUE, NULL, 'http://d-server-scraper:8083/scraper/empenho-ano-anterior');
-
---rollback delete from quartz.scheduler_job_info where job_name = 'job-b';

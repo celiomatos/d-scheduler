@@ -35,6 +35,4 @@ public class SchedulerJobInfo implements Serializable {
     @Column(name = "job_cron", nullable = false)
     private boolean cron;
 
-    @Column(name = "job_command", nullable = false)
-    private String command;
 }
